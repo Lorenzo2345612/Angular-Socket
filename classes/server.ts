@@ -34,7 +34,12 @@ export default class Server {
         console.log('Listening Sockets');
 
         this.io.on('connection', client =>{
-            console.log('Client Connected');
+
+            // Connect Client
+            socket.connectClient( client );
+
+            // Login
+            socket.login(client, this.io);
             
             // emmiters
 
