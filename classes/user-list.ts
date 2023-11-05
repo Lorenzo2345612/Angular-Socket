@@ -12,7 +12,7 @@ export class UserList {
         return user;
     }
 
-    public updateName(id: string, name: string){
+    public updateName(id: string, name?: string){
         for (let user of this.list){
             if (user.id === id){
                 user.name = name;
@@ -23,7 +23,7 @@ export class UserList {
     }
 
     public get userList() {
-        return this.list;
+        return this.list.filter( user => user.name != undefined);
     } 
 
     public getUser(id: string){

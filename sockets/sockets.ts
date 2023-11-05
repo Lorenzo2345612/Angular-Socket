@@ -5,16 +5,18 @@ import { User } from '../classes/user';
 
 export const connectedUsers = new UserList();
 
-export const connectClient = (client: Socket) => {
+export const connectClient = (client: Socket, io: socketIO.Server) => {
     const user = new User(client.id);
     
     connectedUsers.add(user);
 }
 
-export const disconnect = (client: Socket) =>{
+export const disconnect = (client: Socket, io: socketIO.Server) =>{
     client.on('disconnect', () =>{
         connectedUsers.deleteUser(client.id);
     });
+
+    io.emit('connected-users', connectedUsers.userList);
 }
 
 // Listen Messages
@@ -30,11 +32,19 @@ export const message = (client: Socket, io: socketIO.Server) =>{
 // Listen Logins
 export const login = (client: Socket, io: socketIO.Server) => {
     client.on('configurate-user', (payload: { name : string}, callback: Function) => {
-        connectedUsers.updateName(client.id, payload.name);
+        connectedUsers.updateName(client.id, payload.name===''? undefined :payload.name);
 
+        io.emit('connected-users', connectedUsers.userList);
         callback({
             ok: true,
             message: `User ${payload.name}, configured`
         })
     });
+}
+
+// Get connected users
+export const getConnectedUsers = (client: Socket, io: socketIO.Server) => {
+    client.on('get-connected-users', () => {
+        io.to(client.id).emit('connected-users', connectedUsers.userList);
+    })
 }

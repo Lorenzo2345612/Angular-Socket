@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
+import {  RemoteSocket } from 'socket.io';
 import Server from '../classes/server';
+import { connectedUsers } from '../sockets/sockets';
 
 export const router = Router();
 
@@ -52,4 +54,38 @@ router.post('/mensajes/:id', (req: Request, res: Response) => {
         from,
         id
     })
+});
+
+
+// User list service
+
+router.get('/users', (req: Request, res: Response) => {
+    const server = Server.instance;
+
+    server.io.fetchSockets().then(
+        (clients) => {
+            const clientIds = clients.map(client => client.id);
+            res.json({
+                ok: true,
+                clientIds
+            })
+        }
+    ).catch(
+        (err) => {
+            res.json({
+                ok: false,
+                err
+            })
+        }
+    )
+})
+
+// Get users
+router.get('/users/details', (req: Request, res: Response) =>{
+    res.json(
+        {
+            ok: true,
+            clients: connectedUsers.userList
+        }
+    );
 });

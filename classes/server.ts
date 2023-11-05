@@ -36,17 +36,18 @@ export default class Server {
         this.io.on('connection', client =>{
 
             // Connect Client
-            socket.connectClient( client );
+            socket.connectClient( client, this.io );
 
             // Login
             socket.login(client, this.io);
             
             // emmiters
+            socket.getConnectedUsers(client, this.io);
 
             socket.message(client, this.io);
 
             // Disconnect
-            socket.disconnect(client);
+            socket.disconnect(client, this.io);
         });
     }
 
